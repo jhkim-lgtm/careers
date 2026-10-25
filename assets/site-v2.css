@@ -37,3 +37,5 @@
   .mag-link{min-height:40px}
 }
 @media(max-width:359px){.mag-visual,.mag-new-mark{flex-basis:88px;width:88px;margin:14px 0 14px 14px}.mag-body{padding:14px 14px 10px}}
+/* 2026-10-25: 11 marquee covers instead of 8; keep the original scroll speed (80s for 8 covers) */
+.marquee-track{animation-duration:110s}
