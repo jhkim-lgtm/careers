@@ -16,12 +16,12 @@
   /* toast */
   var toastEl = d.querySelector('.toast');
   var toastTimer;
-  function toast(msg) {
+  function toast(msg, ms) {
     if (!toastEl) return;
     toastEl.textContent = msg;
     toastEl.classList.add('show');
     clearTimeout(toastTimer);
-    toastTimer = setTimeout(function () { toastEl.classList.remove('show'); }, 2200);
+    toastTimer = setTimeout(function () { toastEl.classList.remove('show'); }, ms || 2200);
   }
 
   /* mobile sticky apply button */
@@ -113,33 +113,50 @@
     });
   }
 
+  /* clipboard copy with a textarea fallback for in-app browsers */
+  function copyText(value, ok, fail) {
+    var fallback = function () {
+      var ta = d.createElement('textarea');
+      ta.value = value;
+      ta.setAttribute('readonly', '');
+      ta.style.position = 'fixed';
+      ta.style.top = '0';
+      ta.style.opacity = '0';
+      d.body.appendChild(ta);
+      ta.select();
+      var done = false;
+      try { done = d.execCommand('copy'); } catch (err) { done = false; }
+      d.body.removeChild(ta);
+      if (done) ok(); else fail();
+    };
+    if (navigator.clipboard && window.isSecureContext) {
+      navigator.clipboard.writeText(value).then(ok, fallback);
+    } else {
+      fallback();
+    }
+  }
+
   /* copy buttons: e-mail address or this page's link */
   Array.prototype.forEach.call(d.querySelectorAll('[data-copy]'), function (btn) {
     btn.addEventListener('click', function () {
       var value = btn.getAttribute('data-copy');
       if (value === 'page') value = location.href.split('#')[0];
       var okMsg = btn.getAttribute('data-toast') || '이메일 주소를 복사했습니다.';
-      var ok = function () { toast(okMsg); };
-      var fallback = function () {
-        var ta = d.createElement('textarea');
-        ta.value = value;
-        ta.setAttribute('readonly', '');
-        ta.style.position = 'fixed';
-        ta.style.top = '0';
-        ta.style.opacity = '0';
-        d.body.appendChild(ta);
-        ta.select();
-        var done = false;
-        try { done = d.execCommand('copy'); } catch (err) { done = false; }
-        d.body.removeChild(ta);
-        if (done) ok(); else toast('길게 눌러 복사해 주세요.');
-      };
-      if (navigator.clipboard && window.isSecureContext) {
-        navigator.clipboard.writeText(value).then(ok, fallback);
-      } else {
-        fallback();
-      }
+      copyText(value, function () { toast(okMsg); }, function () { toast('길게 눌러 복사해 주세요.'); });
     });
+  });
+
+  /* apply buttons copy the address instead of opening a mail app */
+  d.addEventListener('click', function (e) {
+    var a = e.target.closest ? e.target.closest('a[href^="mailto:"]') : null;
+    if (!a || e.defaultPrevented || e.button || e.metaKey || e.ctrlKey || e.shiftKey || e.altKey) return;
+    e.preventDefault();
+    var href = a.getAttribute('href');
+    var addr = decodeURIComponent(href.slice(7).split('?')[0]);
+    var subject = (href.match(/[?&]subject=([^&]*)/) || [])[1];
+    var line = subject ? '\n메일 제목: ' + decodeURIComponent(subject) : '';
+    copyText(addr, function () { toast('지원 메일 주소를 복사했습니다.' + line, 4500); },
+      function () { toast(addr + '로 보내 주세요.' + line, 7000); });
   });
 
   /* marquee pause / play */

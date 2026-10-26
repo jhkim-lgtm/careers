@@ -305,7 +305,7 @@ button{font:inherit;color:inherit}
 @media (max-width:959px){html{scroll-padding-bottom:104px}}
 
 /* toast */
-.toast{position:fixed;left:50%;bottom:calc(92px + env(safe-area-inset-bottom));z-index:60;transform:translate(-50%,16px);opacity:0;padding:12px 18px;border-radius:14px;background:#2A3340;border:1px solid #3B4757;font-size:14.5px;font-weight:600;color:var(--ink);box-shadow:0 12px 30px rgba(0,0,0,.35);transition:opacity .2s,transform .2s;pointer-events:none;white-space:nowrap}
+.toast{position:fixed;left:50%;bottom:calc(92px + env(safe-area-inset-bottom));z-index:60;transform:translate(-50%,16px);opacity:0;padding:12px 18px;border-radius:14px;background:#2A3340;border:1px solid #3B4757;font-size:14.5px;font-weight:600;color:var(--ink);box-shadow:0 12px 30px rgba(0,0,0,.35);transition:opacity .2s,transform .2s;pointer-events:none;width:max-content;max-width:calc(100vw - 32px);white-space:pre-line;word-break:keep-all;text-align:center;line-height:1.5}
 .toast.show{opacity:1;transform:translate(-50%,0)}
 
 /* reveal */
